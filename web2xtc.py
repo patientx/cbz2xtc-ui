@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-web2xtc - Convert Websites to XTC/XTCH format for XTEink X4
+web2xtc - Convert Websites to XTC/XTCH format for XTEink X3
 Uses Playwright to capture full-page screenshots and converts them.
 
 Usage:
@@ -11,6 +11,21 @@ Usage:
 
 import os
 import sys
+import io 
+
+# ===== FIX WINDOWS ENCODING ISSUES =====
+if sys.platform == "win32":
+    # Force UTF-8 for stdout/stderr
+    if hasattr(sys.stdout, 'reconfigure'):
+        sys.stdout.reconfigure(encoding='utf-8', errors='replace')
+        sys.stderr.reconfigure(encoding='utf-8', errors='replace')
+    else:
+        sys.stdout = io.TextIOWrapper(sys.stdout.buffer, encoding='utf-8', errors='replace')
+        sys.stderr = io.TextIOWrapper(sys.stderr.buffer, encoding='utf-8', errors='replace')
+    # Set environment variable for subprocesses
+    os.environ["PYTHONIOENCODING"] = "utf-8"
+# ========================================
+
 import math
 import heapq
 import random
@@ -37,16 +52,16 @@ Image.MAX_IMAGE_PIXELS = None
 
 
 # Configuration
-TARGET_WIDTH = 480
-TARGET_HEIGHT = 800
+TARGET_WIDTH = 528
+TARGET_HEIGHT = 792
 
 # Global configuration (defaults)
 XTC_MODE = "1bit"        # "1bit" or "2bit"
-DITHER_ALGO = "stucki"    # "floyd", "ordered", "rasterize", "none", "atkinson", "stucki"
+DITHER_ALGO = "zhoufang"    # "floyd", "ordered", "rasterize", "none", "atkinson", "stucki"
 DOWNSCALE_FILTER = Image.Resampling.BICUBIC # Default downscaling filter
 GAMMA_VALUE = 1.0        # Gamma correction value (1.0 = neutral)
 INVERT_COLORS = False    # Invert colors (White <-> Black)
-VIEWPORT = "desktop"     # desktop or mobile
+VIEWPORT = "mobile"     # desktop or mobile
 COOKIES_FILE = None      # Path to Netscape formatted cookies file
 DYNAMIC_MODE = False     # Dynamic crawling mode
 PARALLEL_LINKS = False   # Parallelize link crawling
@@ -567,7 +582,7 @@ def dither_contrast_aware(img, levels):
     return Image.fromarray(final_arr, 'L')
 
 
-def png_to_xtg_bytes(img: Image.Image, force_size=(480, 800), threshold=128):
+def png_to_xtg_bytes(img: Image.Image, force_size=(528, 792), threshold=128):
     """Convert PIL image to XTG bytes (1-bit monochrome)."""
     if img.size != force_size:
         img = img.resize(force_size, DOWNSCALE_FILTER)
@@ -594,7 +609,7 @@ def png_to_xtg_bytes(img: Image.Image, force_size=(480, 800), threshold=128):
     return header + data
 
 
-def png_to_xth_bytes(img: Image.Image, force_size=(480, 800)):
+def png_to_xth_bytes(img: Image.Image, force_size=(528, 792)):
     """
     Convert PIL image to XTH bytes (2-bit grayscale, planar).
     Follows 'cli/encoder.js' from epub-to-xtc-converter:
@@ -771,12 +786,12 @@ def build_xtc_internal(png_paths, out_path, mode="1bit", toc=None):
 
 def optimize_image(img_data, output_path_base, page_num, suffix="", overlap_percent=None):
     """
-    Optimize image for XTEink X4:
+    Optimize image for XTEink X3:
     - crop off image margins (if active)
     - Increase image contrast (unless disabled)
     - Split image in half or overlapping thirds horizontally
     - Rotate each half 90° clockwise
-    - Resize to fit 480x800 with white padding
+    - Resize to fit 528x792 with white padding
     - Convert to grayscale/2-bit
     - Save as PNG (for XTC conversion)
     """
@@ -829,8 +844,8 @@ def optimize_image(img_data, output_path_base, page_num, suffix="", overlap_perc
                 width, height = uncropped_img.size
                 text_position = (width//8,height//2)
                 box_position = ((width//8)-30, (height//2), (width//8)+496, (height//2)+120)
-                width_proportion = width / 800
-                overlapping_third_height = 480 * width_proportion // 1
+                width_proportion = width / 792
+                overlapping_third_height = 528 * width_proportion // 1
                 shiftdown_to_overlap = overlapping_third_height - (overlapping_third_height * 3 - height) // 2
                 contrast_set = 0
                 while contrast_set < 9:
@@ -1074,7 +1089,7 @@ def optimize_image(img_data, output_path_base, page_num, suffix="", overlap_perc
 
 def save_with_padding(img, output_path, *, padcolor=255):
     """
-    Resize image to fit within 480x800 and add white padding.
+    Resize image to fit within 528x792 and add white padding.
     Applies 1-bit or 2-bit conversion with selected dithering.
     """
     img_width, img_height = img.size
@@ -1201,7 +1216,7 @@ def preprocess_for_manhwa(img_data, page_num):
     - Grayscale
     - Margin Crop (if enabled)
     - Rotate if Landscape
-    - Resize to width 480
+    - Resize to width 528
     Returns PIL Image or None
     """
     try:
@@ -1249,7 +1264,7 @@ def preprocess_for_manhwa(img_data, page_num):
                 crop = float(MARGIN_VALUE)
                 img = uncropped_img.crop((int(crop/100.0*width), int(crop/100.0*height), width-int(crop/100.0*width), height-int(crop/100.0*height)))
         
-        # Resize to Target Width (480)
+        # Resize to Target Width (528)
         w, h = img.size
         scale = TARGET_WIDTH / w
         new_h = int(h * scale)
@@ -1264,7 +1279,7 @@ def preprocess_for_manhwa(img_data, page_num):
 def process_manhwa_stream(image_iterator, output_folder):
     """
     Process a stream of images as a continuous vertical strip.
-    Stitches them together and slices into 480x800 pages.
+    Stitches them together and slices into 528x792 pages.
     Detects solid color pages and accelerates scrolling through them.
     """
     print("  Processing in Manhwa Mode (Continuous Strip)...", end=" ", flush=True)
@@ -1385,9 +1400,9 @@ def capture_page_worker(args):
         with sync_playwright() as p:
             if viewport == "mobile":
                 device = p.devices['iPhone 13 Pro']
-                # Override viewport to match XTEink X4 (480x800) for 1:1 pixel mapping
-                device['viewport'] = {'width': 480, 'height': 800}
-                # Disable Retina scaling (DPR=1) for 9x speedup and native 480px width
+                # Override viewport to match XTEink X3 (528x792) for 1:1 pixel mapping
+                device['viewport'] = {'width': 528, 'height': 792}
+                # Disable Retina scaling (DPR=1) for 9x speedup and native 528px width
                 device['device_scale_factor'] = 1
                 # Keep the Mobile User Agent from the device descriptor
                 browser = p.chromium.launch()
@@ -1443,7 +1458,7 @@ def extract_url_to_png(url, temp_dir):
         with sync_playwright() as p:
             if VIEWPORT == "mobile":
                 device = p.devices['iPhone 13 Pro']
-                device['viewport'] = {'width': 480, 'height': 800}
+                device['viewport'] = {'width': 528, 'height': 792}
                 device['device_scale_factor'] = 1
                 browser = p.chromium.launch()
                 context = browser.new_context(**device)
@@ -1486,6 +1501,7 @@ def extract_url_to_png(url, temp_dir):
                     }""")
                     time.sleep(1)
                 except: pass
+
 
             if DYNAMIC_MODE:
                 print("\n  [Dynamic] Identifying interactive elements...", end=" ", flush=True)
@@ -1557,7 +1573,7 @@ def extract_url_to_png(url, temp_dir):
                     with sync_playwright() as p:
                         if VIEWPORT == "mobile":
                             device = p.devices['iPhone 13 Pro']
-                            device['viewport'] = {'width': 480, 'height': 800}
+                            device['viewport'] = {'width': 528, 'height': 792}
                             device['device_scale_factor'] = 1
                             browser = p.chromium.launch()
                             context = browser.new_context(**device)
@@ -1804,12 +1820,12 @@ def process_file(input_obj, output_dir, temp_dir, clean_temp, file_num=None, tot
 
 def main():
     print("=" * 60)
-    print("Web to XTC Converter for XTEink X4")
+    print("Web to XTC Converter for XTEink X3")
     print("=" * 60)
     
     # Check for help flag
     if "--help" in sys.argv or "-h" in sys.argv:
-        print("\nConverts Websites to XTC format optimized for XTEink X4 using Playwright")
+        print("\nConverts Websites to XTC format optimized for XTEink X3 using Playwright")
         print("\nUsage:")
         print("  web2xtc <url>                     # Process URL")
         print("  web2xtc <url> --viewport mobile   # Use mobile viewport (enables Manhwa mode)")
@@ -1992,7 +2008,7 @@ def main():
     DONT_SPLIT_PAGES = []; SELECT_OV_PAGES = []; SAMPLE_PAGES = []
     DESIRED_V_OVERLAP_SEGMENTS = 3; SET_H_OVERLAP_SEGMENTS = 1
     MINIMUM_V_OVERLAP_PERCENT = 5; SET_H_OVERLAP_PERCENT = 70
-    MAX_SPLIT_WIDTH = 800; PADDING_COLOR = 255
+    MAX_SPLIT_WIDTH = 792; PADDING_COLOR = 255
     if "--pad-black" in sys.argv: PADDING_COLOR = 0
 
     # Parse value args (simplified)
