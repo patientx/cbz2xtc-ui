@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-xtc2xtcz - Compress XTC/XTCH files to XTCZ format for XTEink X4
+xtc2xtcz - Compress XTC/XTCH files to XTCZ format for XTEink X3
 
 Usage:
     xtc2xtcz <file.xtc>        # Compress a single file
@@ -58,7 +58,7 @@ def compress_to_xtcz(input_path, output_path):
 def main():
     if len(sys.argv) < 2 or sys.argv[1] in ("-h", "--help"):
         print("============================================================")
-        print("XTC to XTCZ Compressor for XTEink X4")
+        print("XTC to XTCZ Compressor for XTEink X3")
         print("============================================================")
         print("\nCompresses existing .xtc and .xtch files into the .xtcz format using LZ4.")
         print("\nUsage:")
