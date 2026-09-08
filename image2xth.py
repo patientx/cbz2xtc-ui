@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-image2xth - Convert images to 2-bit 4-level grayscale XTH for XTEink X4
+image2xth - Convert images to 2-bit 4-level grayscale XTH for XTEink X3
 Creates high-quality grayscale images perfect for backgrounds
 
 Usage:
@@ -14,8 +14,8 @@ Usage:
 Modes:
     cover (default) - Scale to fill screen and crop overflow (Sharpest fill)
     letterbox       - Scale to fit within screen and add padding
-    fill            - Stretch to fill 480x800 (ignores aspect ratio)
-    crop            - Center crop 480x800 from original without scaling
+    fill            - Stretch to fill 528x792 (ignores aspect ratio)
+    crop            - Center crop 528x792 from original without scaling
 
 Dithering:
     stucki (default), atkinson, ostromoukhov, zhoufang, stochastic (Velho SFC), floyd, contrast-aware, none
@@ -52,8 +52,8 @@ DOWNSCALE_MAP = {
 }
 
 # Configuration
-TARGET_WIDTH = 480
-TARGET_HEIGHT = 800
+TARGET_WIDTH = 528
+TARGET_HEIGHT = 792
 SUPPORTED_FORMATS = {'.jpg', '.jpeg', '.png', '.bmp', '.gif', '.webp', '.tiff', '.tif'}
 
 @njit
@@ -655,7 +655,7 @@ def convert_image(input_path, output_path, dither_algo='atkinson', gamma=1.0, in
 
 def main():
     print("=" * 60)
-    print("Image to XTH/XTG Converter for XTEink X4")
+    print("Image to XTH/XTG Converter for XTEink X3")
     print("=" * 60)
     
     args = sys.argv[1:]
