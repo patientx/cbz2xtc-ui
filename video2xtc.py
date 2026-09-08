@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-video2xtc - Convert Video files to XTC/XTCH format for XTEink X4
+video2xtc - Convert Video files to XTC/XTCH format for XTEink X3
 Extracts frames at 1 FPS and converts them.
 
 Usage:
@@ -29,8 +29,8 @@ from PIL import Image, ImageOps, ImageDraw, ImageFont
 from concurrent.futures import ThreadPoolExecutor, as_completed
 
 # Configuration
-TARGET_WIDTH = 480
-TARGET_HEIGHT = 800
+TARGET_WIDTH = 528
+TARGET_HEIGHT = 792
 
 # Global configuration (defaults)
 XTC_MODE = "1bit"
@@ -487,7 +487,7 @@ def dither_contrast_aware(img, levels):
     final_arr = (output * 255).astype(np.uint8)
     return Image.fromarray(final_arr, 'L')
 
-def png_to_xtg_bytes(img: Image.Image, force_size=(480, 800), threshold=128):
+def png_to_xtg_bytes(img: Image.Image, force_size=(528, 792), threshold=128):
     if img.size != force_size:
         img = img.resize(force_size, Image.Resampling.BILINEAR)
     if img.mode != '1':
@@ -498,7 +498,7 @@ def png_to_xtg_bytes(img: Image.Image, force_size=(480, 800), threshold=128):
     header = struct.pack("<4sHHBBI8s", b"XTG\x00", force_size[0], force_size[1], 0, 0, data_size, md5digest)
     return header + data
 
-def png_to_xth_bytes(img: Image.Image, force_size=(480, 800)):
+def png_to_xth_bytes(img: Image.Image, force_size=(528, 792)):
     if img.size != force_size:
         img = img.resize(force_size, Image.Resampling.BILINEAR)
     arr = np.array(img.convert('L'))
@@ -758,7 +758,7 @@ def process_file(file_path, output_dir, temp_dir, clean_temp, file_num, total_fi
 
 def main():
     print("=" * 60)
-    print("Video to XTC/XTCH Converter for XTEink X4")
+    print("Video to XTC/XTCH Converter for XTEink X3")
     print("=" * 60)
     
     if "--help" in sys.argv or "-h" in sys.argv:
