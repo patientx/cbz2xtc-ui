@@ -19,21 +19,6 @@ class Web2XTCGUI(QMainWindow):
         self.resize(1050, 820)
         self.proc = None
         self.log_queue = queue.Queue()
-        self.vars = {
-            "url": "", "mode": "1bit", "viewport": "mobile",
-            "dither": "zhoufang", "downscale": "bicubic", "gamma": "1.0",
-            "cookies": "", "manhwa_overlap": "5", "contrast": "",
-            "margin": "", "start": "", "stop": "", "skip": "",
-            "only": "", "dont_split": "", "select_overviews": "",
-            "sample_set": "", "vsplit": "", "landscape": "none",
-        }
-        self.booleans = {
-            "invert": False, "dynamic": False, "parallel": False,
-            "overlap": False, "split_spreads": False, "split_all": False,
-            "include_overviews": False, "sideways_overviews": False,
-            "pad_black": False, "clean": False, "compress": False,
-            "manhwa": True
-        }
         self._build()
         self.timer = QTimer()
         self.timer.timeout.connect(self._drain_log)
@@ -212,7 +197,7 @@ class Web2XTCGUI(QMainWindow):
             return
         self.clear_log()
         cmd = self.command()
-        self.log.append("$ " + subprocess.list2cmdline(cmd) + "\n")
+        self.log.append("$ " + subprocess.list2cmdline(cmd))
         self.convert_btn.setEnabled(False)
         self.status_label.setText("Converting…")
         threading.Thread(target=self._run, args=(cmd,), daemon=True).start()
@@ -250,12 +235,12 @@ class Web2XTCGUI(QMainWindow):
                 if isinstance(item, tuple) and item[0] == "__DONE__":
                     self.convert_btn.setEnabled(True)
                     self.status_label.setText("Finished successfully" if item[1] == 0 else f"Error ({item[1]})")
-                    self.log.append("=== Conversion finished ===\n")
+                    self.log.append("=== Conversion finished ===")
                 else:
                     # Strip all whitespace from both ends
                     line = item.strip()
                     if line:  # Only add non-empty lines
-                        self.log.append(line + "\n")
+                        self.log.append(line)
         except queue.Empty:
             pass            
 
