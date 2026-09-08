@@ -61,7 +61,7 @@ Ensure Python 3 is installed on your system.
 ### 2. Install Required Libraries
 Open your terminal (Command Prompt/PowerShell on Windows, Terminal on macOS/Linux) and run:
 ```bash
-pip install pillow numpy numba pymupdf playwright lz4 PySide6
+pip install pillow numpy numba pymupdf playwright lz4 PySide6 poppler-utils
 ```
 
 ### 3. Web Support (For `web2xtc.py`)
