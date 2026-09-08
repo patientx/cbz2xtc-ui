@@ -5,6 +5,7 @@ A comprehensive suite of tools for converting various media formats (CBZ, PDF, i
 These tools are designed to maximize the reading experience on e-ink displays by offering advanced dithering, efficient panel splitting, and fast rendering.
 
 ## Key Features
+* UI for web page conversion.
 - **Multi-format Support:** Convert from archives (CBZ), documents (PDF), websites, videos, and raw images.
 - **Smart Formatting:** Auto-split landscape spreads into portrait panels, generate overviews, and support long-strip manhwa/webtoon scrolling.
 - **E-ink Optimization:** Multiple dithering algorithms for e-ink limited bit depth.
