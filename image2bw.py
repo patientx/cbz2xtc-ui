@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-image2bw - Convert images to 1-bit black & white BMP for XTEink X4 backgrounds
+image2bw - Convert images to 1-bit black & white BMP for XTEink X3 backgrounds
 Creates ultra-fast loading images perfect for backgrounds
 
 Usage:
@@ -16,7 +16,7 @@ Dithering algorithms:
     rasterize        - Halftone-like pattern (newspaper style)
     none             - Pure threshold at 50% (sharpest, best for clean line art)
 
-Note: Always outputs BMP format (XTEink X4 doesn't support PNG images)
+Note: Always outputs BMP format (XTEink X3 doesn't support PNG images)
 """
 
 import sys
@@ -25,8 +25,8 @@ from PIL import Image
 
 
 # Configuration
-TARGET_WIDTH = 480
-TARGET_HEIGHT = 800
+TARGET_WIDTH = 528
+TARGET_HEIGHT = 792
 SUPPORTED_FORMATS = {'.jpg', '.jpeg', '.png', '.bmp', '.gif', '.webp', '.tiff', '.tif'}
 
 # Dithering algorithm descriptions
@@ -109,7 +109,7 @@ def convert_to_bw(input_path, dither_algo='floyd'):
 
 def main():
     print("=" * 60)
-    print("Image to 1-bit B&W BMP Converter for XTEink X4")
+    print("Image to 1-bit B&W BMP Converter for XTEink X3")
     print("Perfect for fast-loading backgrounds")
     print("=" * 60)
     
@@ -127,9 +127,9 @@ def main():
         print("\nFor text-heavy manga (like Hunter x Hunter):")
         print("  Try: --dither none     (sharpest text)")
         print("  Or:  --dither ordered  (grid pattern, often clearer)")
-        print("\nOutput: 480x800 1-bit BMP images")
+        print("\nOutput: 528x792 1-bit BMP images")
         print("File size: Usually 15-40KB (ultra-fast loading!)")
-        print("\nNote: Always outputs BMP (XTEink X4 doesn't support PNG)")
+        print("\nNote: Always outputs BMP (XTEink X3 doesn't support PNG)")
         return 0
     
     # Parse dithering algorithm
@@ -159,7 +159,7 @@ def main():
     print(f"\nInput: {input_path.absolute()}")
     print(f"Output format: BMP (1-bit black & white)")
     print(f"Dithering: {dither_algo.upper()} - {DITHER_ALGORITHMS[dither_algo]['desc']}")
-    print(f"Target size: 480x800 pixels")
+    print(f"Target size: 528x792 pixels")
     print("-" * 60)
     
     # Process based on input type
@@ -195,7 +195,7 @@ def main():
     
     print("-" * 60)
     print(f"\nCompleted! Successfully converted {success_count}/{total_count}")
-    print("\nThese 1-bit BMP images should load INSTANTLY on your XTEink X4!")
+    print("\nThese 1-bit BMP images should load INSTANTLY on your XTEink X3!")
     print("Perfect for backgrounds and fast display.")
     
     if input_path.is_file() and success_count > 0:
