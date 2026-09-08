@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-cbz2xtc - Convert CBZ manga and PDF files to XTC/XTCH format for XTEink X4
+cbz2xtc - Convert CBZ manga and PDF files to XTC/XTCH format for XTEink X3
 All-in-one tool: Extraction → Optimization → XTC/XTCH Encoding
 
 Usage:
@@ -40,8 +40,8 @@ import random
 
 
 # Configuration
-TARGET_WIDTH = 480
-TARGET_HEIGHT = 800
+TARGET_WIDTH = 528
+TARGET_HEIGHT = 792
 
 # Global configuration (defaults)
 XTC_MODE = "1bit"        # "1bit" or "2bit"
@@ -590,7 +590,7 @@ def dither_contrast_aware(img, levels):
     return Image.fromarray(final_arr, 'L')
 
 
-def png_to_xtg_bytes(img: Image.Image, force_size=(480, 800), threshold=128):
+def png_to_xtg_bytes(img: Image.Image, force_size=(528, 792), threshold=128):
     """Convert PIL image to XTG bytes (1-bit monochrome)."""
     if img.size != force_size:
         img = img.resize(force_size, DOWNSCALE_FILTER)
@@ -617,7 +617,7 @@ def png_to_xtg_bytes(img: Image.Image, force_size=(480, 800), threshold=128):
     return header + data
 
 
-def png_to_xth_bytes(img: Image.Image, force_size=(480, 800)):
+def png_to_xth_bytes(img: Image.Image, force_size=(528, 792)):
     """
     Convert PIL image to XTH bytes (2-bit grayscale, planar).
     Follows 'cli/encoder.js' from epub-to-xtc-converter:
@@ -857,12 +857,12 @@ def build_xtc_internal(png_paths, out_path, mode="1bit", toc=None, cover_page=0)
 
 def optimize_image(img_data, output_path_base, page_num, suffix="", overlap_percent=None):
     """
-    Optimize image for XTEink X4:
+    Optimize image for XTEink X3:
     - crop off image margins (if active)
     - Increase image contrast (unless disabled)
     - Split image in half or overlapping thirds horizontally
     - Rotate each half 90° clockwise
-    - Resize to fit 480x800 with white padding
+    - Resize to fit 528x792 with white padding
     - Convert to grayscale/2-bit
     - Save as PNG (for XTC conversion)
     """
@@ -913,8 +913,8 @@ def optimize_image(img_data, output_path_base, page_num, suffix="", overlap_perc
                 width, height = uncropped_img.size
                 text_position = (width//8,height//2)
                 box_position = ((width//8)-30, (height//2), (width//8)+496, (height//2)+120)
-                width_proportion = width / 800
-                overlapping_third_height = 480 * width_proportion // 1
+                width_proportion = width / 792
+                overlapping_third_height = 528 * width_proportion // 1
                 shiftdown_to_overlap = overlapping_third_height - (overlapping_third_height * 3 - height) // 2
                 contrast_set = 0
                 while contrast_set < 9:
@@ -1164,7 +1164,7 @@ def optimize_image(img_data, output_path_base, page_num, suffix="", overlap_perc
 
 def save_with_padding(img, output_path, *, padcolor=255):
     """
-    Resize image to fit within 480x800 and add white padding.
+    Resize image to fit within 528x792 and add white padding.
     Applies 1-bit or 2-bit conversion with selected dithering.
     """
     img_width, img_height = img.size
@@ -1291,7 +1291,7 @@ def preprocess_for_manhwa(img_data, page_num):
     - Grayscale
     - Margin Crop (if enabled)
     - Rotate if Landscape
-    - Resize to width 480
+    - Resize to width 528
     Returns PIL Image or None
     """
     try:
@@ -1339,7 +1339,7 @@ def preprocess_for_manhwa(img_data, page_num):
                 crop = float(MARGIN_VALUE)
                 img = uncropped_img.crop((int(crop/100.0*width), int(crop/100.0*height), width-int(crop/100.0*width), height-int(crop/100.0*height)))
         
-        # Resize to Target Width (480)
+        # Resize to Target Width (528)
         w, h = img.size
         scale = TARGET_WIDTH / w
         new_h = int(h * scale)
@@ -1354,7 +1354,7 @@ def preprocess_for_manhwa(img_data, page_num):
 def process_manhwa_stream(image_iterator, output_folder):
     """
     Process a stream of images as a continuous vertical strip.
-    Stitches them together and slices into 480x800 pages.
+    Stitches them together and slices into 528x792 pages.
     Detects solid color pages and accelerates scrolling through them.
     """
     print("  Processing in Manhwa Mode (Continuous Strip)...", end=" ", flush=True)
@@ -1446,7 +1446,7 @@ def extract_pdf_to_png(pdf_path, temp_dir):
             return output_folder
 
         def process_pdf_page(idx, page, output_folder):
-            # Render page to image (default 72 DPI, usually enough for 480x800 target)
+            # Render page to image (default 72 DPI, usually enough for 528x792 target)
             pix = page.get_pixmap(matrix=fitz.Matrix(2, 2)) # 2x scale for better quality before resizing
             img_data = pix.tobytes("png")
             output_base = output_folder / f"{idx:04d}"
@@ -1699,12 +1699,12 @@ def process_file(file_path, output_dir, temp_dir, clean_temp, file_num=None, tot
 
 def main():
     print("=" * 60)
-    print("CBZ to XTC Converter for XTEink X4")
+    print("CBZ to XTC Converter for XTEink X3")
     print("=" * 60)
     
     # Check for help flag
     if "--help" in sys.argv or "-h" in sys.argv:
-        print("\nConverts CBZ manga and PDF files to XTC format optimized for XTEink X4")
+        print("\nConverts CBZ manga and PDF files to XTC format optimized for XTEink X3")
         print("\nUsage:")
         print("  cbz2xtc                           # Process current directory")
         print("  cbz2xtc /path/to/folder           # Process specific folder")
@@ -1906,7 +1906,7 @@ def main():
     SET_H_OVERLAP_SEGMENTS = 1
     SET_V_OVERLAP_PERCENT = 5.0
     SET_H_OVERLAP_PERCENT = 70
-    MAX_SPLIT_WIDTH = 800
+    MAX_SPLIT_WIDTH = 792
     PADDING_COLOR = 255
 
     if "--pad-black" in sys.argv:
@@ -2098,7 +2098,7 @@ def main():
     else:
         print(f"Temporary PNG files are in: {temp_dir.absolute()}")
     
-    print("\nTransfer the .xtc/.xtch files to your XTEink X4!")
+    print("\nTransfer the .xtc/.xtch files to your XTEink X3!")
     
     return 0 if success_count == len(input_files) else 1
 
