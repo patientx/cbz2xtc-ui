@@ -26,6 +26,7 @@ Processes multiple pages and files in parallel. Ideal for standard manga and com
 An alternative PDF converter that uses Poppler for potentially better rendering on complex PDFs.
 
 ### `web2xtc.py`
+* Run `web2xtcgui.py` for a simple UI with all options present. (must have PySide6 installed.)
 Converts websites directly to XTC/XTCH format. Perfect for web novels or online manga.
 - **Full Page Capture**: Screenshots the entire scrolling page.
 - **Dynamic Mode**: Expands dropdowns and crawls links (chapters/sub-pages).
